@@ -2598,6 +2598,7 @@
       hifrqfrq =  3600.0    ! frequency (seconds)
 
 !----------------------------------------------------------------------
+    
 
       call init_physics(prs0,rf0,dum1,dum2,dum3,u0,ua,v0,va,o30,   &
                              lu_index,xland,emiss,thc,albd,znt,mavail,tsk,u1,v1,s1, &
@@ -2607,6 +2608,7 @@
                         lu_index,xland,tsk,slab_zs,slab_dzs,tslb, &
                         emiss,thc,albd,znt,rznt,mavail,dsxy,prs0s,prs0,   &
                         tmn,tml,t0ml,hml,h0ml,huml,hvml,tmoml,z0base)
+      
 
       IF(irst.eq.1)THEN
 
@@ -3575,7 +3577,9 @@
 
       IF( axisymm.eq.0 .and. doazimavg .or. do_adapt_move )THEN
         IF( do_adapt_move .and. mtime.ge.adaptmovetim )THEN
-        IF( dowriteout .or. dohifrqwrite .or. doazimwrite )THEN
+        ! IF( dowriteout .or. dohifrqwrite .or. doazimwrite )THEN !< [KKA] why
+        ! is this block only accessible on writes? What if the move frequency
+        ! differs? Bad tings!
         if( nstep.ge.1 )then
 
           if( .not. restarted )then
@@ -3587,7 +3591,7 @@
           call   getrangle(xh,yh,xcenter,ycenter,cir,crr,cangle)
 
         endif
-        ENDIF
+        ! ENDIF !< [KKA]
         ENDIF
       ENDIF
 
@@ -3937,6 +3941,9 @@
       !cccccccccccccccccccccccccccccccccccccccccccccccccccccccc!
       !cccccccccccccccccccccccccccccccccccccccccccccccccccccccc!
 
+#ifdef MPI
+          call MPI_BARRIER (MPI_COMM_WORLD,ierr)
+#endif
 
       if(iprcl.eq.1)then
       IF( doprclout )THEN

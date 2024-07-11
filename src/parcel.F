@@ -3,12 +3,156 @@
   implicit none
 
   private
+  public :: parcel_read
   public :: parcel_driver,parcel_interp,parcel_write,setup_parcel_vars,getparcelzs
 
   CONTAINS
 
-      subroutine parcel_driver(dt,xh,uh,ruh,xf,yh,vh,rvh,yf,zh,mh,rmh,zf,mf,zs,    &
-                               sigma,sigmaf,znt,rho,ua,va,wa,pdata)
+      subroutine parcel_read(pdata)
+      use input
+#ifdef MPI
+      use mpi
+#endif
+      implicit none
+      
+      real, intent(inout), dimension(nparcels,npvals) :: pdata
+      
+      !< maximum number of parcels to initialize
+      !< ... will anybody need at least 10M parcels?
+      integer, parameter :: max_parcels = 9999999 
+      integer :: n,fparcels_n
+      integer :: fparcel_unit
+      character(len=60) :: fname
+      real, dimension(:), allocatable :: xtmp,ytmp,ztmp,ttmp
+
+
+      if(dowr) write(outfile,*)
+      if(dowr) write(outfile,*) 'Inside PARCEL_READ '
+      if(dowr) write(outfile,*)
+
+#ifdef MPI
+      call MPI_BARRIER (MPI_COMM_WORLD,ierr)
+#endif
+
+      allocate( xtmp(nparcels) )
+      allocate( ytmp(nparcels) )
+      allocate( ztmp(nparcels) )
+      allocate( ttmp(nparcels) )
+      xtmp = 0.0
+      ytmp = 0.0
+      ztmp = 0.0
+      ttmp = 0.0
+      
+      fparcels_n = 0
+     
+      !< open and read parcel list file
+      !< (probably no reason to have multiple parcel lists, right?)
+      myid0:  &
+      if (myid.eq.0)then
+        
+        print *
+        print *,' ------------------------------------------------------- '
+        print *
+        print *,'  PARCEL_READ'
+        
+        fname = 'parcel_list.dat'
+
+        open(unit=fparcel_unit,file=fname,status='old',err=9090)
+
+        print *
+        print *,'  Found fname = ',fname
+        
+        !< read the header, and then read the parcel init data
+        read(fparcel_unit,*)
+        
+        do n=1,max_parcels
+          read(fparcel_unit,*,err=8888,end=9999) xtmp(n),ytmp(n),ztmp(n),ttmp(n)
+          fparcels_n = fparcels_n + 1
+          if( fparcels_n .gt. max_parcels )then
+            print *
+            print *,'  max_parcels = ',max_parcels,' is too small '
+            print *,'  (increase value and recompile) '
+            print *
+            print *,'  ... stopping cm1 ... '
+            print *
+            call stopcm1
+          endif
+        enddo
+
+9999    print *,'  Found ',fparcels_n,' parcels in ',fname
+
+        if (fparcels_n.ne.nparcels)then
+          print *
+          print *,'  Number of parcels in ',fname,' does not match namelist'
+          print *,'  parcels in ',fname,' = ',fparcels_n
+          print *,'  parcels in namelist = ',nparcels
+          print *
+          print *,'  ... stopping cm1 ... '
+          print *
+          call stopcm1
+        endif
+
+        close(unit=fparcel_unit)
+
+      endif myid0
+
+9090  continue
+      
+      if ( myid.eq.0 .and. fparcels_n.eq.0)then
+        print *
+        print *,'  No ',fname,' found'
+        print *,'  ... stopping cm1 ... '
+        print *
+        call stopcm1
+      endif
+
+#ifdef MPI
+      !< communicate new vars to all PEs:
+      call MPI_BCAST(xtmp(1),nparcels,MPI_REAL,0,MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(ytmp(1),nparcels,MPI_REAL,0,MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(ztmp(1),nparcels,MPI_REAL,0,MPI_COMM_WORLD,ierr)
+      call MPI_BCAST(ttmp(1),nparcels,MPI_REAL,0,MPI_COMM_WORLD,ierr)
+#endif
+
+      !< fill parcel location fields
+      do n=1,nparcels
+        pdata(n,prx) = xtmp(n) 
+        pdata(n,pry) = ytmp(n) 
+        pdata(n,prz) = ztmp(n) 
+        pdata(n,prrt) = ttmp(n) 
+      enddo
+
+#ifdef MPI
+      call MPI_BARRIER (MPI_COMM_WORLD,ierr)
+#endif
+      
+      deallocate( xtmp )
+      deallocate( ytmp )
+      deallocate( ztmp )
+      deallocate( ttmp )
+      
+      if (myid.eq.0)then
+        print *
+        print *,'  EXITING PARCEL_READ'
+        print *
+        print *,' ------------------------------------------------------- '
+        print *
+      endif
+
+      return
+
+8888 print *
+     print *,'  There was an error reading fparcel_unit = ',fparcel_unit
+     print *
+     print *,'  ... stopping cm1 ... '
+     print *
+     call stopcm1
+
+      end subroutine parcel_read
+
+
+      subroutine parcel_driver(dt,mtime,xh,uh,ruh,xf,yh,vh,rvh,yf,zh,mh,rmh,zf, &
+                                mf,zs,sigma,sigmaf,znt,rho,ua,va,wa,pdata)
       use input
       use constants
       use bc_module
@@ -23,6 +167,7 @@
 !-----------------------------------------------------------------------
 
       real, intent(in) :: dt
+      double precision, intent(in) :: mtime !< [KA] added as argument
       real, intent(in), dimension(ib:ie) :: xh,uh,ruh
       real, intent(in), dimension(ib:ie+1) :: xf
       real, intent(in), dimension(jb:je) :: yh,vh,rvh
@@ -49,7 +194,9 @@
       real :: z0,rznt,var
       real :: sigdot,sig1,zsp,sig3d
 
-      logical, parameter :: debug = .false.
+      logical, parameter :: debug = .true.
+
+
 
 !----------------------------------------------------------------------
 !  apply bottom/top boundary conditions:
@@ -136,6 +283,11 @@
 
     nploop:  &
     DO np=1,nparcels
+
+      !----------------------------------------------------------------------
+      !  [KA] Before doing anything, check if the parcel has been
+      !       released yet (or is released this step)
+      IF (mtime.lt.pdata(np,prrt)) CYCLE
 
       x3d = pdata(np,prx)
       y3d = pdata(np,pry)
@@ -724,7 +876,7 @@
       real :: rxu,ryv,rzw,rxs,rys,rzs
       real :: x3d,y3d,z3d,z0,rznt,var
 
-      logical, parameter :: debug = .false.
+      logical, parameter :: debug = .true.
 
 !----------------------------------------------------------------------
 !  Get derived variables:
@@ -1015,6 +1167,16 @@
                              tkw1,tkw2,tke1,tke2,tks1,tks2,tkn1,tkn2,reqs_p,0)
       endif
       if( prtke.ge.1 )then
+        !< [KA 240524] Bug(?): with mynn pbl options, the subroutine below
+        !< unexpectedly sets some elements in znt to 0.0. It is unclear how this
+        !< happens, considering znt isn't even passed as an argument. 
+        !< In any case, this ends up bricking the parcel tracer capability. 
+        !< When CM1 is built to fail on divide-by-zero events, znt being set to 0.0 
+        !> ends up crashing the model in a call to the getcecd subroutine 
+        !< in sfcphys_module (sfcphys.F). 
+        !< This bug(?) can be avoided by setting prcl_tke=0 in the namelist, 
+        !< but for users needing TKE outputs this is a problem
+        !< that may need some digging into comm.F.
         call prepcornert(tke3d,nw1(1),nw2(1),ne1(1),ne2(1),sw1(1),sw2(1),se1(1),se2(1), &
                                tkw1,tkw2,tke1,tke2,tks1,tks2,tkn1,tkn2,reqs_p,0)
       endif
@@ -1130,7 +1292,7 @@
       IF( jflag.eq.nj .and. pdata(np,pry).eq.yf(jflag+1) .and. nodey.gt.1 .and.  myj.ne.nodey ) jflag = -1
     ENDIF
 #endif
-
+      
       myprcl:  IF( (iflag.ge.1.and.iflag.le.ni) .and.   &
                    (jflag.ge.1.and.jflag.le.nj) )THEN
 
@@ -1151,7 +1313,7 @@
         x3d = pdata(np,prx)
         y3d = pdata(np,pry)
         z3d = pdata(np,prz)
-
+        
 !----------------------------------------------------------------------
 !  Data on u points
 
@@ -1448,7 +1610,7 @@
 
         if(prpt1.ge.1)then
           do n=1,npt
-          call tri_interp(ni,nj,nk,i,j,k,w1,w2,w3,w4,w5,w6,w7,w8,pt3d(ib,jb,kb,n),pdata(np,prpt1+n-1))
+            call tri_interp(ni,nj,nk,i,j,k,w1,w2,w3,w4,w5,w6,w7,w8,pt3d(ib,jb,kb,n),pdata(np,prpt1+n-1))
           enddo
         endif
 
@@ -1593,8 +1755,12 @@
       ELSE
 
         ! set to really small number (so we can use the allreduce command below)
+        !< [KA] release time is a constant from initialization;
+        !<      don't modify it on any PE!
         do n=4,npvals
-          pdata(np,n) = -1.0e30
+          if (n .ne. prrt)then
+            pdata(np,n) = -1.0e30
+          endif
         enddo
 #endif
 
@@ -1941,6 +2107,12 @@
       prcl_out = prcl_out+1
       name_prcl(prcl_out) = 'mtime'
       desc_prcl(prcl_out) = 'model time (seconds since beginning of simulation)'
+      unit_prcl(prcl_out) = 's'
+      
+      !< [KA] release time
+      prcl_out = prcl_out+1
+      name_prcl(prcl_out) = 'rtime'
+      desc_prcl(prcl_out) = 'release time (s)'
       unit_prcl(prcl_out) = 's'
 
       if( prth.ge.1 )then

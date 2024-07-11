@@ -6335,6 +6335,7 @@
       prv = 0
       prw = 0
       prtime = 0
+      prrt = 0 !< [KA] release time
       prth = 0
       prt = 0
       prprs = 0
@@ -6366,7 +6367,8 @@
         ! 7 basic variables for all simulations:
         ! (x,y,z,u,v,w,t)
         !  1 2 3 4 5 6 7
-        npvals = 7
+        !< [KA] adding 8th var: release time
+        npvals = 8
 
         prx = 1
         pry = 2
@@ -6375,6 +6377,7 @@
         prv = 5
         prw = 6
         prtime = 7
+        prrt = 8
 
         if( prcl_th.eq.1 )then
           npvals = npvals+1
@@ -6492,6 +6495,7 @@
       if(dowr) write(outfile,*) '    prv      = ',prv
       if(dowr) write(outfile,*) '    prw      = ',prw
       if(dowr) write(outfile,*) '    prtime   = ',prtime
+      if(dowr) write(outfile,*) '    prrt     = ',prrt !< [KA]
       if(dowr) write(outfile,*) '    prth     = ',prth
       if(dowr) write(outfile,*) '    prt      = ',prt
       if(dowr) write(outfile,*) '    prprs    = ',prprs

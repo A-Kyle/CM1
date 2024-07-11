@@ -22,6 +22,7 @@
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !-----------------------------------------------------------------------
 
+!< [KA] in defiance of the above, added prrt = parcel release time
       integer ierr
 
 !-----------------------------------
@@ -81,7 +82,7 @@
               imirror,jmirror,                                                &
               imp,jmp,kmp,kmt,rmp,cmp,nrain,                                  &
               numq,nqv,nqc,nqr,nqi,nqs,nqg,nnci,nncc,nqi2,nqi3,               &
-              prx,pry,prz,pru,prv,prw,prth,prt,prprs,prtime,                  &
+              prx,pry,prz,pru,prv,prw,prth,prt,prprs,prtime,prrt,             &
               prpt1,prpt2,prqv,prq1,prq2,prnc1,prnc2,prkm,prkh,prtke,         &
               prdbz,prb,prvpg,przv,prrho,prqsl,prqsi,prznt,prust,przs,prsig,  &
               nql1,nql2,nqs1,nqs2,nnc1,nnc2,nvl1,nvl2,nzl1,nzl2,              &

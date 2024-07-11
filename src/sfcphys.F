@@ -146,6 +146,7 @@
         !-----------------------------------------
         ! water:  roughness length (z0) is a function of windspeed
         ! use last known z0 for first guess:
+        
         rznt = 1.0/znt(i,j)
         var = alog((10.0+znt(i,j))*rznt)/alog((za(i,j)+znt(i,j))*rznt)
         s10(i,j) = s1(i,j)*var

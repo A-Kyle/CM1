@@ -272,6 +272,7 @@
 
 #ifdef MPI
       ! communicate the new variables to all processors:
+      print *,'  lsnudge myid= ',myid
       call MPI_BCAST(lsnudge_levels,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(lsnudge_time1,lsnudge_nmax,MPI_REAL,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(lsnudge_time2,lsnudge_nmax,MPI_REAL,0,MPI_COMM_WORLD,ierr)
