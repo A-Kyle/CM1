@@ -2,3 +2,9 @@ run/freezeH2O.dat
 run/ishmael*
 run/p3_*
 run/qr_*
+src/*.mod
+src/*.f90
+src/*.o
+*.swp
+*.exe
+run/onefile.F
