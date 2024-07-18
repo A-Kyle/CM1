@@ -1,10 +1,17 @@
 run/freezeH2O.dat
+run/proc.info
+run/input_sounding
+run/run_cm1.sh
+run/cm1_config.txt
 run/ishmael*
 run/p3_*
 run/qr_*
+run/cm1out_*
+run/s.*
 src/*.mod
 src/*.f90
 src/*.o
 *.swp
 *.exe
 run/onefile.F
+.gitignore

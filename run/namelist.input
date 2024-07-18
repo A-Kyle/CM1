@@ -15,9 +15,9 @@
  dy     =  4000.0,
  dz     =   500.0,
  dtl    =  10.000,
- timax  =  1200.0,
+ timax  =  86400.0,
  run_time =  -999.9,
- tapfrq =   86400.0,
+ tapfrq =   10800.0,
  rstfrq =  345600.0,
  statfrq =   86400.0,
  prclfrq =   60.0,
@@ -83,7 +83,7 @@
  npt       =  1,
  pdtra     =  1,
  iprcl     =  1,
- nparcels  =  13290,
+ nparcels  =  64480,
  /
 
  &param3
@@ -333,17 +333,17 @@
  prcl_prs      = 1,
  prcl_ptra     = 1,
  prcl_q        = 1,
- prcl_nc       = 1,
- prcl_km       = 1,
- prcl_kh       = 1,
+ prcl_nc       = 0,
+ prcl_km       = 0,
+ prcl_kh       = 0,
  prcl_tke      = 0,
  prcl_dbz      = 1,
  prcl_b        = 1,
- prcl_vpg      = 1,
+ prcl_vpg      = 0,
  prcl_vort     = 1,
- prcl_rho      = 1,
- prcl_qsat     = 1,
- prcl_sfc      = 1,
+ prcl_rho      = 0,
+ prcl_qsat     = 0,
+ prcl_sfc      = 0,
  /
 
  &param14
