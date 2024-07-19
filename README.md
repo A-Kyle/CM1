@@ -28,6 +28,12 @@ The user must set up the `namelist.input` file as before when tracking parcels.
 In the output parcel file, a new field representing the time of parcel release, 
 `rtime`, has been added.
 
+#### Example
+
+Below is an animation of parcel trajectories released hourly between 12 and 24 hours (h) from the same spatial coordinates (enclosed in a black polygon in quadrant 3) in a low-resolution hurricane simulation. Released parcel paths from the previous 45 minutes are shown and shaded by elevation.  A timeline is shown at the top, and the circle on the timeline marks the time in the simulation. The circle on the timeline flickers dark red when parcels are released.
+
+![an example](https://raw.githubusercontent.com/A-Kyle/CM1/master/examples/traj_0.gif)
+
 #### Known bugs
 
 - An issue related to tracking turbulent kinetic energy (TKE) leads to model crashes when using certain planetary boundary layer schemes.
