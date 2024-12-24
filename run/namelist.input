@@ -3,11 +3,12 @@
  nx           =     384,
  ny           =     384,
  nz           =      59,
- ppnode       =      8,
+ ppnode       =       8,
  timeformat   =       3,
  timestats    =       1,
  terrain_flag = .false.,
  procfiles    = .false.,
+ outunits     =       1,
  /
 
  &param1
@@ -186,11 +187,11 @@
  /
 
  &param8
- var1      =   22.5,
- var2      =   100000.0,
- var3      =   15000.0,
- var4      =   500000.0,
- var5      =   1.0,
+ var1      =   0.0,
+ var2      =   0.0,
+ var3      =   0.0,
+ var4      =   0.0,
+ var5      =   0.0,
  var6      =   0.0,
  var7      =   0.0,
  var8      =   0.0,
@@ -210,7 +211,7 @@
 
  &param9
  output_format    = 1,
- output_filetype  = 2,
+ output_filetype  = 1,
  output_interp    = 0,
  output_rain      = 1,
  output_sws       = 1,

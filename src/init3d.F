@@ -79,7 +79,7 @@
       use bc_module
       use module_mp_nssl_2mom, only: ccn, lccn
       use poiss_module
-      use parcel_module , only : parcel_read,getparcelzs
+      use parcel_module , only : getparcelzs, parcel_read
 #ifdef MPI
       use mpi
 #endif
@@ -708,6 +708,8 @@
         !    2 = modified Rankine vortex  ( this is now default, starting in cm1r20.1 )
         tctype  =  2
 
+
+
         !      Default analytic vortex since cm1r20.1:
         ! for tctype=2, parameters for modified Rankine vortex:
         vmax =   15.0         ! V max (m/s)
@@ -716,14 +718,17 @@
         rm3  = 500000.0       ! 3rd radius (m): location where V=0
         rdc  =  -0.35         ! radial decay rate (nondimensional) between rm1 and rm2
                               !   ( where v = Vmax (r/rm1)^rdc )
-        
-        ! for all tctypes:
-        zdd         =    15000.0     ! height (ASL) where V=0
+
 
         ! for tctype=1, parameters for Rotunno-Emanuel (1987) analytic vortex:
         r0_re87     =   412500.0
         rmax_re87   =    82500.0
         vmax_re87   =       15.0
+
+
+        ! for all tctypes:
+        zdd         =    15000.0     ! height (ASL) where V=0
+
 
         !  170502, experimental code for moist initial vortex:
         rhmods  =   .false.    !  use this code?
@@ -811,37 +816,38 @@
           call stopcm1
         ENDIF
 
-        IF( tctype.eq.1 )THEN
-          ! Rotunno-Emanuel (1987) vortex:
-          dd2 = 2.0 * rmax_re87 / ( r0_re87 + rmax_re87 )
-          do i=1,nref
-            if(rref(i).lt.r0_re87)then
-              dd1 = 2.0 * rmax_re87 / ( rref(i) + rmax_re87 )
-              vt(i) = sqrt( vmax_re87**2 * (rref(i)/rmax_re87)**2     &
-              * ( dd1 ** 3 - dd2 ** 3 ) + 0.25*fcor*fcor*rref(i)*rref(i) )   &
-                      - 0.5 * fcor * rref(i)
-            else
-              vt(i) = 0.0
-            endif
-          enddo
-        ELSEIF( tctype.eq.2 )THEN
-          ! modified Rankine vortex:
-          do i=1,nref
-            if( rref(i).lt.rm1 )then
-              vt(i) = vmax*rref(i)/rm1
-            elseif( rref(i).lt.rm2 )then
-              vt(i) = vmax*( (rref(i)/rm1)**rdc )
-            elseif( rref(i).lt.rm3 )then
-              v2 = vmax*( (rref(i)/rm1)**rdc )
-              v3 = vmax*0.5*(1.0-(rref(i)-rm2)/(rm3-rm2))
-              w3 = (rref(i)-rm2)/(rm3-rm2)
-              w2 = 1.0-w3
-              vt(i) = w2*v2+w3*v3
-            else
-              vt(i) = 0.0
-            endif
-          enddo
-        ENDIF
+
+      IF( tctype.eq.1 )THEN
+        ! Rotunno-Emanuel (1987) vortex:
+        dd2 = 2.0 * rmax_re87 / ( r0_re87 + rmax_re87 )
+        do i=1,nref
+          if(rref(i).lt.r0_re87)then
+            dd1 = 2.0 * rmax_re87 / ( rref(i) + rmax_re87 )
+            vt(i) = sqrt( vmax_re87**2 * (rref(i)/rmax_re87)**2     &
+            * ( dd1 ** 3 - dd2 ** 3 ) + 0.25*fcor*fcor*rref(i)*rref(i) )   &
+                    - 0.5 * fcor * rref(i)
+          else
+            vt(i) = 0.0
+          endif
+        enddo
+      ELSEIF( tctype.eq.2 )THEN
+        ! modified Rankine vortex:
+        do i=1,nref
+          if( rref(i).lt.rm1 )then
+            vt(i) = vmax*rref(i)/rm1
+          elseif( rref(i).lt.rm2 )then
+            vt(i) = vmax*( (rref(i)/rm1)**rdc )
+          elseif( rref(i).lt.rm3 )then
+            v2 = vmax*( (rref(i)/rm1)**rdc )
+            v3 = vmax*0.5*(1.0-(rref(i)-rm2)/(rm3-rm2))
+            w3 = (rref(i)-rm2)/(rm3-rm2)
+            w2 = 1.0-w3
+            vt(i) = w2*v2+w3*v3
+          else
+            vt(i) = 0.0
+          endif
+        enddo
+      ENDIF
 
 
         if( myid.eq.0 )then
