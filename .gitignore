@@ -11,6 +11,7 @@ run/s.*
 src/*.mod
 src/*.f90
 src/*.o
+src/Makefile_*
 *.swp
 *.exe
 run/onefile.F
