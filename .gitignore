@@ -15,5 +15,5 @@ src/*.o
 *.exe
 run/onefile.F
 .gitignore
-*.gs
 scripts/*.png
+private/

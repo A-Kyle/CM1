@@ -218,7 +218,7 @@
       ! write effective radii:
       logical, parameter :: doeff = .false.
 
-      logical, parameter :: writemynn = .false. !< [KA] (un)mute MYNN PBL outputs
+      logical, parameter :: writemynn = .true. ! set false to mute MYNN PBL outputs
 
 !!!#ifdef MPI
 !!!      call MPI_BARRIER (MPI_COMM_WORLD,ierr)
@@ -6255,7 +6255,7 @@
   !.............................................
 
 
-      IF (writemynn) THEN !< [KA]
+      IF (writemynn) THEN
       IF( ipbl.eq.4 .or. ipbl.eq.5 )THEN
         n_out = n_out + 1
         name_output(n_out) = 'qke'
@@ -6606,7 +6606,7 @@
           enddo
         call   writes(dum1,fnum,srec,nwrite,nloop,dat1,dat2,dat3,reqt,myi1p,myi2p,myj1p,myj2p,ncid,time_index,name_output(n_out),sigma,zs,zh,dum9)
       ENDIF
-      ENDIF !< [KA]
+      ENDIF
 
   !.............................................
 

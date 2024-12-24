@@ -17,8 +17,8 @@
       
       real, intent(inout), dimension(nparcels,npvals) :: pdata
       
-      !< maximum number of parcels to initialize
-      !< ... will anybody need at least 10M parcels?
+      ! maximum number of parcels to initialize
+      ! ... will anybody need at least 10M parcels?
       integer, parameter :: max_parcels = 9999999 
       integer :: n,fparcels_n
       integer :: fparcel_unit
@@ -45,8 +45,7 @@
       
       fparcels_n = 0
      
-      !< open and read parcel list file
-      !< (probably no reason to have multiple parcel lists, right?)
+      ! open and read parcel list file
       myid0:  &
       if (myid.eq.0)then
         
@@ -62,7 +61,7 @@
         print *
         print *,'  Found fname = ',fname
         
-        !< read the header, and then read the parcel init data
+        ! read the header, and then read the parcel init data
         read(fparcel_unit,*)
         
         do n=1,max_parcels
@@ -107,14 +106,14 @@
       endif
 
 #ifdef MPI
-      !< communicate new vars to all PEs:
+      ! communicate new vars to all PEs:
       call MPI_BCAST(xtmp(1),nparcels,MPI_REAL,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(ytmp(1),nparcels,MPI_REAL,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(ztmp(1),nparcels,MPI_REAL,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(ttmp(1),nparcels,MPI_REAL,0,MPI_COMM_WORLD,ierr)
 #endif
 
-      !< fill parcel location fields
+      ! fill parcel location fields
       do n=1,nparcels
         pdata(n,prx) = xtmp(n) 
         pdata(n,pry) = ytmp(n) 
@@ -194,7 +193,7 @@
       real :: z0,rznt,var
       real :: sigdot,sig1,zsp,sig3d
 
-      logical, parameter :: debug = .true.
+      logical, parameter :: debug = .false.
 
 
 
@@ -876,7 +875,7 @@
       real :: rxu,ryv,rzw,rxs,rys,rzs
       real :: x3d,y3d,z3d,z0,rznt,var
 
-      logical, parameter :: debug = .true.
+      logical, parameter :: debug = .false.
 
 !----------------------------------------------------------------------
 !  Get derived variables:
@@ -1167,16 +1166,16 @@
                              tkw1,tkw2,tke1,tke2,tks1,tks2,tkn1,tkn2,reqs_p,0)
       endif
       if( prtke.ge.1 )then
-        !< [KA 240524] Bug(?): with mynn pbl options, the subroutine below
-        !< unexpectedly sets some elements in znt to 0.0. It is unclear how this
-        !< happens, considering znt isn't even passed as an argument. 
-        !< In any case, this ends up bricking the parcel tracer capability. 
-        !< When CM1 is built to fail on divide-by-zero events, znt being set to 0.0 
-        !> ends up crashing the model in a call to the getcecd subroutine 
-        !< in sfcphys_module (sfcphys.F). 
-        !< This bug(?) can be avoided by setting prcl_tke=0 in the namelist, 
-        !< but for users needing TKE outputs this is a problem
-        !< that may need some digging into comm.F.
+        ! [KA 240524] bug?: 
+        ! with mynn pbl options, after the following subroutine is called,
+        ! some elements in znt are set to 0.0.
+        ! I'm not sure how this happens.
+        ! In any case, this ends up bricking the parcel tracer capability. 
+        ! When CM1 is built to fail on divide-by-zero events, znt being set to 0.0 
+        ! ends up crashing the model in a call to the getcecd subroutine 
+        ! in sfcphys_module (sfcphys.F). 
+        ! This bug goes away when setting prcl_tke=0 in the namelist,
+        ! but will require a fix if TKE is needed.
         call prepcornert(tke3d,nw1(1),nw2(1),ne1(1),ne2(1),sw1(1),sw2(1),se1(1),se2(1), &
                                tkw1,tkw2,tke1,tke2,tks1,tks2,tkn1,tkn2,reqs_p,0)
       endif
@@ -1755,8 +1754,8 @@
       ELSE
 
         ! set to really small number (so we can use the allreduce command below)
-        !< [KA] release time is a constant from initialization;
-        !<      don't modify it on any PE!
+        ! [KA] release time is a constant from initialization---
+        !      don't modify it on any PE!
         do n=4,npvals
           if (n .ne. prrt)then
             pdata(np,n) = -1.0e30
@@ -2109,7 +2108,6 @@
       desc_prcl(prcl_out) = 'model time (seconds since beginning of simulation)'
       unit_prcl(prcl_out) = 's'
       
-      !< [KA] release time
       prcl_out = prcl_out+1
       name_prcl(prcl_out) = 'rtime'
       desc_prcl(prcl_out) = 'release time (s)'

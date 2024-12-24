@@ -3577,9 +3577,11 @@
 
       IF( axisymm.eq.0 .and. doazimavg .or. do_adapt_move )THEN
         IF( do_adapt_move .and. mtime.ge.adaptmovetim )THEN
-        ! IF( dowriteout .or. dohifrqwrite .or. doazimwrite )THEN !< [KKA] why
-        ! is this block only accessible on writes? What if the move frequency
-        ! differs? Bad tings!
+        IF( dowriteout .or. dohifrqwrite .or. doazimwrite )THEN
+        ! Q [KA]:  This block appears only accessible on write steps,
+        !          but what if the move frequency differs from write frequency?
+        !          Could this be an issue for (adaptive) moving domains?
+        
         if( nstep.ge.1 )then
 
           if( .not. restarted )then
@@ -3589,9 +3591,9 @@
           endif
 
           call   getrangle(xh,yh,xcenter,ycenter,cir,crr,cangle)
-
         endif
-        ! ENDIF !< [KKA]
+        
+        ENDIF !< [KA] end of block in question Q
         ENDIF
       ENDIF
 

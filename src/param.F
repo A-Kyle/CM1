@@ -6495,7 +6495,7 @@
       if(dowr) write(outfile,*) '    prv      = ',prv
       if(dowr) write(outfile,*) '    prw      = ',prw
       if(dowr) write(outfile,*) '    prtime   = ',prtime
-      if(dowr) write(outfile,*) '    prrt     = ',prrt !< [KA]
+      if(dowr) write(outfile,*) '    prrt     = ',prrt
       if(dowr) write(outfile,*) '    prth     = ',prth
       if(dowr) write(outfile,*) '    prt      = ',prt
       if(dowr) write(outfile,*) '    prprs    = ',prprs

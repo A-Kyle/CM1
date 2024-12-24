@@ -22,7 +22,6 @@
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !-----------------------------------------------------------------------
 
-!< [KA] in defiance of the above, added prrt = parcel release time
       integer ierr
 
 !-----------------------------------
