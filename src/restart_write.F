@@ -1689,7 +1689,7 @@
 !---------------------------------------------------------------
 !  parcels:
 
-      if(iprcl.eq.1)then
+      if(iprcl.ge.1)then
         !-----------------
         ! with parcels:
         if(myid.eq.0)then

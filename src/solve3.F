@@ -452,7 +452,7 @@
 !----------
 !  comms for parcels:
 
-      IF(iprcl.eq.1)THEN
+      IF(iprcl.ge.1)THEN
         ! cm1r18:  use velocities averaged over small time steps (for psolver=2,3,6,7)
         IF( psolver.eq.2 .or. psolver.eq.3 .or. psolver.eq.6 .or. psolver.eq.7 )THEN
           ! 180713:  now saved in ten1 arrays
@@ -701,7 +701,7 @@
 !cc  Update parcel locations  ccccccccccccccccccccccccccccccccccccccc
 !cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
-      IF(iprcl.eq.1)THEN
+      IF(iprcl.ge.1)THEN
         !  get corner info, ghost zone data, etc:
         !  (may not parallelize correctly if this is not done)
 #ifdef MPI
@@ -779,8 +779,8 @@
 
         endif  prltrn
 
-        call     parcel_driver(dt,xh,uh,ruh,xf,yh,vh,rvh,yf,zh,mh,rmh,zf,mf,zs,    &
-                               sigma,sigmaf,zntmp,rho,rru,rrv,rrw,pdata)
+        call     parcel_driver(dt,mtime,xh,uh,ruh,xf,yh,vh,rvh,yf,zh,mh,rmh,zf, &
+                               mf,zs,sigma,sigmaf,zntmp,rho,rru,rrv,rrw,pdata)
         if(timestats.ge.1) time_parcels=time_parcels+mytime()
       ENDIF
 

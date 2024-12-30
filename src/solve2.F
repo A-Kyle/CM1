@@ -1270,7 +1270,7 @@
 
 !--------------------------------------------------------------------
 
-      if( iprcl.eq.1 .and. nrk.eq.nrkmax )then
+      if( iprcl.ge.1 .and. nrk.eq.nrkmax )then
         ! save time-averaged velocities for parcel driver:
         do k=1,nk+1
         do j=1,nj+1

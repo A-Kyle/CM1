@@ -2585,7 +2585,7 @@
       rstat = 0.0
 
 
-      if( iprcl.eq.1 )  &
+      if( iprcl.ge.1 )  &
       call       setup_parcel_vars(name_prcl,desc_prcl,unit_prcl,qname)
 
 
@@ -3126,7 +3126,7 @@
 
 
         doprclout  =  .false.
-        if( iprcl.eq.1 )then
+        if( iprcl.ge.1 )then
           if( (mtime+dbldt).ge.(prcltim-0.1d0*dbldt) .or. prclfrq.lt.0.0 ) doprclout  =  .true.
         endif
 
@@ -3174,7 +3174,7 @@
             getdbz = .true.
           endif
         ENDIF
-        IF( iprcl.eq.1 .and. prcl_dbz.eq.1 )THEN
+        IF( iprcl.ge.1 .and. prcl_dbz.eq.1 )THEN
           if( ((mtime+dbldt).ge.(prcltim-0.1d0*dbldt)) .or. prclfrq.le.0.0 )then
             getdbz = .true.
           endif
@@ -3938,7 +3938,7 @@
       !cccccccccccccccccccccccccccccccccccccccccccccccccccccccc!
 
 
-      if(iprcl.eq.1)then
+      if(iprcl.ge.1)then
       IF( doprclout )THEN
         call     parcel_interp(dt,mtime,xh,uh,ruh,xf,uf,yh,vh,rvh,yf,vf, &
                                zh,mh,rmh,zf,mf,zntmp,ust,c1,c2,        &

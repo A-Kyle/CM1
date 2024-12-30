@@ -245,7 +245,7 @@
 710   continue
       rewind(20)
 
-      if( iprcl.eq.1 )then
+      if( iprcl.ge.1 )then
         read(20,nml=param13,end=713)
 713     continue
         rewind(20)
@@ -6335,6 +6335,7 @@
       prv = 0
       prw = 0
       prtime = 0
+      prrt = 0
       prth = 0
       prt = 0
       prprs = 0
@@ -6361,7 +6362,7 @@
       prsig = 0
 
       ! for parcels:
-      if(iprcl.eq.1)then
+      if(iprcl.ge.1)then
 
         ! 7 basic variables for all simulations:
         ! (x,y,z,u,v,w,t)
@@ -6375,6 +6376,10 @@
         prv = 5
         prw = 6
         prtime = 7
+
+        ! each parcel is assigned a release time
+        npvals = npvals+1
+        prrt = npvals
 
         if( prcl_th.eq.1 )then
           npvals = npvals+1
@@ -6492,6 +6497,7 @@
       if(dowr) write(outfile,*) '    prv      = ',prv
       if(dowr) write(outfile,*) '    prw      = ',prw
       if(dowr) write(outfile,*) '    prtime   = ',prtime
+      if(dowr) write(outfile,*) '    prrt     = ',prrt
       if(dowr) write(outfile,*) '    prth     = ',prth
       if(dowr) write(outfile,*) '    prt      = ',prt
       if(dowr) write(outfile,*) '    prprs    = ',prprs

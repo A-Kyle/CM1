@@ -79,7 +79,7 @@
       use bc_module
       use module_mp_nssl_2mom, only: ccn, lccn
       use poiss_module
-      use parcel_module , only : getparcelzs
+      use parcel_module , only : getparcelzs,parcel_read
 #ifdef MPI
       use mpi
 #endif
@@ -405,6 +405,10 @@
         ENDIF
 
       ENDIF
+      IF(iprcl.eq.2)THEN
+        call parcel_read(pdata)
+      ENDIF
+
 
 !-----------------------------------------------------------------------
 !  initialize random number generator:
@@ -2543,7 +2547,7 @@
 
 !------------------------------------------------------------------
 
-      if( iprcl.eq.1 .and. terrain_flag )THEN
+      if( iprcl.ge.1 .and. terrain_flag )THEN
         ! get terrain at parcel locations:
         if( prsig.ge.1 )then
           call getparcelzs(xh,uh,ruh,xf,yh,vh,rvh,yf,zs,pdata)

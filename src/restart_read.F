@@ -2113,7 +2113,7 @@
       call MPI_BCAST(nvar,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
 #endif
 
-      if( iprcl.eq.1 .or. nvar.gt.0 )then
+      if( iprcl.ge.1 .or. nvar.gt.0 )then
         if( nvar.gt.0 )then
           ! only read position info:
           if( myid.eq.0 )then
@@ -2130,7 +2130,7 @@
               endif
             ELSE
               ! annoying:  restart file has different nparcels than current config
-              IF( iprcl.eq.1 )THEN
+              IF( iprcl.ge.1 )THEN
                 if( .not. terrain_flag )then
                   do np=1,nparcels
                     ploc(np,1) = pdata(np,prx)
@@ -2156,7 +2156,7 @@
                 call disp_err( nf90_get_var(ncid,varid,pfoo,(/1,1,time_index/),(/nvar,n,1/)) , .true. )
 #endif
               endif
-              IF( iprcl.eq.1 )THEN
+              IF( iprcl.ge.1 )THEN
                 do n=1,3
                 do np=1,min(nvar,nparcels)
                   ploc(np,n) = pfoo(np,n)
@@ -2167,7 +2167,7 @@
               if( myid.eq.0 ) print *,'  end pfoo ' 
             ENDIF
           endif
-          IF( iprcl.eq.1 )THEN
+          IF( iprcl.ge.1 )THEN
 #ifdef MPI
             call MPI_BCAST(ploc,3*nparcels,MPI_REAL,0,MPI_COMM_WORLD,ierr)
 #endif

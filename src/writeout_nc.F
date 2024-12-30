@@ -713,7 +713,7 @@
       call disp_err( nf90_def_dim(ncid,'time',nf90_unlimited,timeid) , .true. )
       call disp_err( nf90_def_dim(ncid,'nbudget',nbudget,nbudgetid) , .true. )
       call disp_err( nf90_def_dim(ncid,'numq',numq,numqid) , .true. )
-    if( iprcl.eq.1 )then
+    if( iprcl.ge.1 )then
       n = 3
       call disp_err( nf90_def_dim(ncid,'nploc',n,plocid) , .true. )
       n = max( 1 , nparcels )
@@ -1208,7 +1208,7 @@
       enddo
     endif
 
-    if( iprcl.eq.1 )then
+    if( iprcl.ge.1 )then
       call disp_err( nf90_def_var(ncid,"ploc"    ,nf90_float,(/nparcelsid,plocid,timeid/),varid) , .true. )
     endif
 
