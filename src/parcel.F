@@ -1022,16 +1022,6 @@
                              tkw1,tkw2,tke1,tke2,tks1,tks2,tkn1,tkn2,reqs_p,0)
       endif
       if( prtke.ge.1 )then
-        ! [KA 240524] bug?:
-        ! with mynn pbl options, after the following subroutine is called,
-        ! some elements in znt are set to 0.0.
-        ! I'm not sure how this happens, but
-        ! this ends up bricking the parcel tracer capability.
-        ! When CM1 is built to fail on divide-by-zero events, znt being set to 0.0
-        ! ends up crashing the model in a call to the getcecd subroutine
-        ! in sfcphys_module (sfcphys.F).
-        ! This bug goes away when setting prcl_tke=0 in the namelist,
-        ! but will require a fix if TKE is needed.
         call prepcornert(tke3d,nw1(1),nw2(1),ne1(1),ne2(1),sw1(1),sw2(1),se1(1),se2(1), &
                                tkw1,tkw2,tke1,tke2,tks1,tks2,tkn1,tkn2,reqs_p,0)
       endif
